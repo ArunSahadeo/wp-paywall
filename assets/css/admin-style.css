@@ -1,0 +1,183 @@
+/*
+    Colour variables
+*/
+
+:root
+{
+    --light-grey: #f6f6f6;
+    --medium-grey: #ccc;
+}
+
+/*
+    Colours
+*/
+
+.light-grey
+{
+    color: var(--light-grey);
+}
+
+/*
+    Background colours
+*/
+
+.bg-light-grey
+{
+    background-color: var(--light-grey);
+}
+
+/*
+    Borders
+*/
+
+.border-bottom-1
+{
+    border-bottom: 1px solid;
+}
+
+.border-medium-grey
+{
+    border-color: var(--medium-grey);
+}
+
+/*
+    Positions
+*/
+
+.position-relative
+{
+    position: relative;
+}
+
+/*
+    Margins
+*/
+
+.margin-top-15
+{
+    margin-top: 15px;
+}
+
+.margin-top-20
+{
+    margin-top: 20px;
+}
+
+.margin-top-50
+{
+    margin-top: 50px;
+}
+
+.margin-right-15
+{
+    margin-right: 15px;
+}
+
+.margin-right-300
+{
+    margin-right: 300px;
+}
+
+/*
+    Paddings
+*/
+
+.padding-25
+{
+    padding: 25px;
+}
+
+.padding-bottom-50
+{
+    padding-bottom: 50px;
+}
+
+.padding-vert-20
+{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+/*
+    Widths
+*/
+
+.width-100-pc
+{
+    width: 100%;
+}
+
+/*
+    Max widths
+*/
+
+.max-width-25-pc
+{
+    max-width: 25%;
+}
+
+/*
+    Floats
+*/
+
+.float-left
+{
+    float: left;
+}
+
+/*
+    Displays
+*/
+
+.display-none
+{
+    display: none;
+}
+
+.display-block
+{
+    display: block;
+}
+
+.display-inline-block
+{
+    display: inline-block;
+}
+
+/*
+    Cursors
+*/
+
+.cursor-not-allowed
+{
+    cursor: not-allowed;
+}
+
+/*
+    Vertical aligns
+*/
+
+.vertical-align-middle
+{
+    vertical-align: middle;
+}
+
+/*
+    Specific
+*/
+
+.nav-tabs > span:first-child > a
+{
+    margin-left: 0;
+}
+
+.nav-tab.active
+{
+    pointer-events: none;
+}
+
+.table-custom td
+{
+    padding-top: 5px;
+    padding-left: 0;
+}
