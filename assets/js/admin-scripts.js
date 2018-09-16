@@ -46,6 +46,16 @@ App.prototype = {
                 textInput.addEventListener('input', this.autoscaleInput);
             }
         };
+
+        if (this.elementExists('[data-input-event-target]')) {
+            var inputEventElements = document.querySelectorAll('[data-input-event-target]'); 
+
+            for (var i = 0; i < inputEventElements.length; i++)
+            {
+                var inputEventElement = inputEventElements[i];
+                inputEventElement.addEventListener('input', this.toggleInputTargetVisibility);
+            }
+        }
     },
 
     elementExists: function(selector) {
@@ -72,6 +82,33 @@ App.prototype = {
         parents.push(parentSelector);
 
         return parents;
+    },
+
+    toggleInputTargetVisibility: function() {
+        var selector = event.target || event.srcElement,
+            target = selector.dataset.inputEventTarget;
+
+        var self = window.App.prototype;
+
+        if (!self.elementExists(target))
+        {
+            return;
+        }
+
+        target = document.querySelector(target);
+
+        if (selector.value < 1)
+        {
+            if (!target.classList.contains('display-none'))
+            {
+                target.classList.add('display-none'); 
+            }
+        }
+
+        else
+        {
+            target.classList.remove('display-none');
+        }
     },
 
     visibilityToggleState: function() {

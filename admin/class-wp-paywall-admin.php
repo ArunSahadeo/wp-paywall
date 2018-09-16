@@ -158,6 +158,25 @@ class WP_Paywall_Admin
             'wpp_options',
             'wpp_options_general'
         );
+
+        add_settings_field(
+            'subscription_period',
+            __( 'Subscription period', 'wp-paywall' ),
+            array( $this, 'renderSubscriptionPeriodField' ),
+            'wpp_options',
+            'wpp_options_general'
+        );
+
+        add_settings_field(
+            'subscription_period_frequency',
+            __( 'Subscription period frequency', 'wp-paywall' ),
+            array( $this, 'renderSubscriptionPeriodFrequencyField' ),
+            'wpp_options',
+            'wpp_options_general',
+            [
+                'class' => 'display-none subscription-frequency',
+            ]
+        );
     }
 
     public function registerSettingsContent()
@@ -215,6 +234,13 @@ class WP_Paywall_Admin
             'wpp_styles_settings'
         );
 
+        add_settings_field(
+            'paywall_overlay_background',
+            __( 'Paywall Overlay Background', 'wp-paywall' ),
+            array( $this, 'renderPaywallOverlayBackgroundTextField' ),
+            'wpp_styles',
+            'wpp_styles_settings'
+        );
     
     }
 
@@ -398,6 +424,48 @@ class WP_Paywall_Admin
     <?php
     }
 
+    public function renderSubscriptionPeriodField()
+    {
+    ?>
+
+    <input data-input-event-target=".subscription-frequency" type="number" min="1" />
+
+    <span class="description display-block max-width-25-pc">
+        <?php echo __( 'Please set the period for which the subscription is valid.', 'wp-paywall' ); ?>
+    </span>
+    
+    <?php
+    }
+
+    public function renderSubscriptionPeriodFrequencyField()
+    {
+    ?>
+
+    <select>
+        <option value="0" disabled>
+            Please select the frequency
+        </option>
+
+        <option value="1">
+            Week(s)
+        </option>
+
+        <option value="2">
+            Month(s)
+        </option>
+
+        <option value="3">
+            Year(s)
+        </option>
+    </select>
+
+    <span class="description display-block max-width-25-pc">
+        <?php echo __( 'Please set the period frequency for which the subscription is valid.', 'wp-paywall' ); ?>
+    </span>
+    
+    <?php
+    }
+
     public function renderCurrencyField()
     {
         $currencies = $this->currencies;
@@ -432,7 +500,7 @@ class WP_Paywall_Admin
     public function renderBottomBarHeadingField()
     {
     ?>
-    <input type="text" name="wpp_content_settings[bottom_bar_heading]" draggable value="Subscribe for just a [amount] per [fee_frequency]" />
+    <input type="text" name="wpp_content_settings[bottom_bar_heading]" draggable value="Subscribe for just a [amount] per [subscription_period]" />
     <?php
     }
 
@@ -446,7 +514,7 @@ class WP_Paywall_Admin
     public function renderPaywallOverlayTextField()
     {
     ?>
-    <textarea name="wpp_content_settings[paywall_overlay_text]" placeholder="Please enter the copy to be used"></textarea>
+    <textarea class="width-100-pc" name="wpp_content_settings[paywall_overlay_text]" placeholder="Please enter the copy to be used"></textarea>
     <?php
     }
 
@@ -459,6 +527,13 @@ class WP_Paywall_Admin
     {
     ?>
     <input type="text" name="wpp_styles_settings[bottom_bar_cta_background]" /> 
+    <?php
+    }
+
+    public function renderPaywallOverlayBackgroundTextField()
+    {
+    ?>
+    <input type="text" name="wpp_styles_settings[paywall_overlay_background]" /> 
     <?php
     }
 }
