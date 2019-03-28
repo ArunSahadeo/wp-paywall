@@ -16,6 +16,10 @@ define( 'WP_PAYWALL_PLUGIN', __FILE__ );
 
 define( 'WP_PAYWALL_PLUGIN_DIR', untrailingslashit(dirname(WP_PAYWALL_PLUGIN)) );
 
+define( 'WP_PAYWALL_PLUGIN_BASENAME', plugin_basename(__FILE__) );
+
+define( 'WP_PAYWALL_PLUGIN_NAME', basename(WP_PAYWALL_PLUGIN_BASENAME, '.php') );
+
 if ( !defined('WP_PAYWALL_PLUGIN_URL') )
 {
     define( 'WP_PAYWALL_PLUGIN_URL', plugin_dir_url(__FILE__) );

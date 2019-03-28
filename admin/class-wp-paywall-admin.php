@@ -33,6 +33,16 @@ class WP_Paywall_Admin
         add_action( 'admin_menu', array($this, 'installMenu') );    
         add_action( 'admin_init', array($this, 'registerSettings') );
         add_action( 'admin_enqueue_scripts', array($this, 'enqueueScripts') );
+        add_filter( 'plugin_action_links_' . WP_PAYWALL_PLUGIN_BASENAME, array($this, 'addActionLinks' ) );
+    }
+
+    public function addActionLinks($links)
+    {
+        $pluginLinks = [
+            '<a href="' . admin_url( 'options-general.php?page=' . WP_PAYWALL_PLUGIN_NAME) . '">Settings</a>'
+        ];
+
+        return array_merge($links, $pluginLinks);
     }
 
     public function registerSettings()
