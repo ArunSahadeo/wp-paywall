@@ -19,7 +19,7 @@
         </div>
 
         <div class="form-container">
-            <form action="options.php" method="POST">
+            <form action="" method="POST">
                 <div data-tab-section="general">
                     <?php
                         include WP_PAYWALL_PLUGIN_DIR . '/admin/partials/section-general.php';

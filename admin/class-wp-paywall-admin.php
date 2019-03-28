@@ -42,6 +42,27 @@ class WP_Paywall_Admin
         $this->registerSettingsStyles();
     }
 
+    public function getDefaultGeneralSettings()
+    {
+        $defaults = array(
+            'article_limit' => 2,
+            'article_limit_frequency' => 'monthly',
+            'excluded_post_types'   => array('attachment') 
+        );
+
+        return $defaults;
+    } 
+
+    public function getDefaultContentSettings()
+    {
+        $defaults = array(
+            'bottom_bar_heading' => 'Subscribe for just a [amount] per [subscription_period]',
+            'bottom_bar_cta_text'   => 'View Details'
+        );
+
+        return $defaults;
+    } 
+
     public function enqueueScripts()
     {
         wp_enqueue_style( 'wpp-admin-style', WP_PAYWALL_PLUGIN_URL . '/assets/css/admin-style.css' );
@@ -80,6 +101,24 @@ class WP_Paywall_Admin
             'content'   => __( 'Content', 'wp-paywall' ),
             'styles'    => __( 'Styles', 'wp-paywall' )
         );        
+
+        if ( isset($_POST) && !empty($_POST) )
+        {
+            if ( isset($_POST['wpp_options_settings']) )
+            {
+               update_option( 'wpp_options_settings', $_POST['wpp_options_settings'] ); 
+            }
+
+            if ( isset($_POST['wpp_content_settings']) )
+            {
+               update_option( 'wpp_content_settings', $_POST['wpp_content_settings'] ); 
+            }
+
+            if ( isset($_POST['wpp_styles_settings']) )
+            {
+               update_option( 'wpp_styles_settings', $_POST['wpp_options_settings'] ); 
+            }
+        }
 
         include WP_PAYWALL_PLUGIN_DIR . '/admin/templates/page-options.php'; 
     }
@@ -136,7 +175,7 @@ class WP_Paywall_Admin
         );
 
         add_settings_field(
-            'accepted_payment_providers',
+            'accepted_providers',
             __( 'Accepted Payment Providers', 'wp-paywall' ),
             array( $this, 'renderAcceptedProvidersField' ),
             'wpp_options',
@@ -177,6 +216,15 @@ class WP_Paywall_Admin
                 'class' => 'display-none subscription-frequency',
             ]
         );
+
+        $generalOptions = get_option('wpp_options_settings');
+
+        if ( false === $generalOptions )
+        {
+            $defaults = $this->getDefaultGeneralSettings();
+            update_option('wpp_options_settings', $defaults);
+
+        }
     }
 
     public function registerSettingsContent()
@@ -213,6 +261,15 @@ class WP_Paywall_Admin
             'wpp_content',
             'wpp_content_settings'
         );
+
+        $contentOptions = get_option('wpp_content_settings');
+
+        if ( false === $contentOptions )
+        {
+            $defaults = $this->getDefaultContentSettings();
+            update_option('wpp_content_settings', $defaults);
+
+        }
     }
 
     public function registerSettingsStyles()
@@ -251,9 +308,11 @@ class WP_Paywall_Admin
 
     public function renderLimitField()
     {
+        $options = get_option( 'wpp_options_settings' );
+        $articleLimit = $options['article_limit'];
     ?>
 
-    <input type="number" min="0" name="wpp_options_settings[article_limit]" />
+    <input type="number" min="0" name="wpp_options_settings[article_limit]"<?php echo isset($articleLimit) ? ' value="' . $articleLimit . '"' : '' ; ?> />
     <span class="description display-block max-width-25-pc">
         <?php echo __( 'Please enter the number of articles a user can read for free before being required to sign up', 'wp-paywall' ); ?>
     </span>
@@ -263,22 +322,24 @@ class WP_Paywall_Admin
 
     public function renderLimitFrequencyField()
     {
+        $options = get_option( 'wpp_options_settings' );
+        $articleLimitFrequency = $options['article_limit_frequency'];
     ?>
 
     <table class="table-custom contains-radios">
         <tr>
             <td>
-                <input type="radio" name="wpp_options_settings[article_limit_frequency][daily]" value="daily" /> Daily
+            <input type="radio" id="daily" name="wpp_options_settings[article_limit_frequency][daily]" <?php checked( in_array('daily', $articleLimitFrequency), 1 ); ?> value="daily" /> Daily
             </td>
         </tr>
         <tr>
             <td>
-                <input type="radio" name="wpp_options_settings[article_limit_frequency][weekly]" value="weekly" /> Weekly
+            <input type="radio" id="weekly" name="wpp_options_settings[article_limit_frequency][weekly]" <?php checked( in_array('weekly', $articleLimitFrequency), 1 ); ?> value="weekly" /> Weekly
             </td>
         </tr>
         <tr>
             <td>
-                <input type="radio" name="wpp_options_settings[article_limit_frequency][monthly]" value="monthly" /> Monthly
+                <input type="radio" id="monthly" name="wpp_options_settings[article_limit_frequency][monthly]" <?php checked( in_array('monthly', $articleLimitFrequency), 1 ); ?> value="monthly" /> Monthly
             </td>
         </tr>
     </table>
@@ -291,19 +352,21 @@ class WP_Paywall_Admin
 
     public function renderCounterField()
     {
+        $options = get_option( 'wpp_options_settings' );
+        $articleCounter = $options['article_counter'];
     ?>
 
     <table class="table-custom contains-radios">
         <tr>
             <td>
-                <input type="radio" data-visibility-toggle-target="#character_limit" name="wpp_options_settings[article_counter][characters]" value="characters" /> Characters
-                <table class="margin-top-20 display-none visibility-field" id="character_limit">
+                <input type="radio" data-visibility-toggle-target="#character_limit" <?php checked( isset($articleCounter['characters']) && !empty($articleCounter['characters']['limit']), 1 ); ?> name="wpp_options_settings[article_counter][characters]" value="characters" /> Characters
+                <table class="margin-top-20<?php echo empty($articleCounter['characters']['limit']) ? ' display-none ' : ''; ?>visibility-field" id="character_limit">
                     <tr>
                         <td>
                             <label for="wpp_options_settings[article_counter][characters][limit]">
                                 Character Limit:
                             </label>
-                            <input type="number" name="wpp_options_settings[article_counter][characters][limit]" min="0" />
+                            <input type="number" name="wpp_options_settings[article_counter][characters][limit]" min="0"<?php echo !empty($articleCounter['characters']['limit']) ? ' value="' . $articleCounter[characters][limit] . '"' : ''; ?> />
                         </td>
                     </tr>
                 </table>
@@ -311,14 +374,14 @@ class WP_Paywall_Admin
         </tr>
         <tr>
             <td>
-                <input type="radio" data-visibility-toggle-target="#paragraph_limit" name="wpp_options_settings[article_counter][paragraphs]" value="paragraphs" /> Paragraphs
-                <table class="margin-top-20 display-none visibility-field" id="paragraph_limit">
+                <input type="radio" data-visibility-toggle-target="#paragraph_limit" <?php checked( isset($articleCounter['paragraphs']) && !empty($articleCounter['paragraphs']['limit']), 1 ); ?> name="wpp_options_settings[article_counter][paragraphs]" value="paragraphs" /> Paragraphs
+                <table class="margin-top-20<?php echo empty($articleCounter['paragraphs']['limit']) ? ' display-none ' : ''; ?>visibility-field" id="paragraph_limit">
                     <tr>
                         <td>
-                            <label for="wpp_options_settings[article_counter][paragraph][limit]">
+                            <label for="wpp_options_settings[article_counter][paragraphs][limit]">
                                 Paragraph Limit:
                             </label>
-                            <input type="number" id="character_limit" name="wpp_options_settings[article_counter][characters][limit]" min="0" />
+                            <input type="number" id="paragraph_limit" name="wpp_options_settings[article_counter][paragraphs][limit]" min="0" <?php if (!empty($articleCounter['paragraphs']['limit'])) echo 'value="' . $articleCounter['paragraphs']['limit'] . '"'; ?> />
                         </td>
                     </tr>
                 </table>
@@ -356,6 +419,9 @@ class WP_Paywall_Admin
         {
             return;
         }
+
+        $options = get_option( 'wpp_options_settings' );
+        $excludedPostTypes = $options['excluded_post_types'];
     ?>
 
     <table class="table-custom">
@@ -368,7 +434,7 @@ class WP_Paywall_Admin
         ?>
         <tr>
             <td>
-                <input type="checkbox" value="" /> <?php echo $checkboxText; ?> 
+                <input type="checkbox" name="wpp_options_settings[excluded_post_types][<?php echo $type; ?>]" <?php checked( isset($excludedPostTypes[$type]), 1 ); ?> /> <?php echo $checkboxText; ?> 
             </td>
         </tr>
         <?php endforeach; ?>
@@ -383,24 +449,26 @@ class WP_Paywall_Admin
 
     public function renderAcceptedProvidersField()
     {
+        $options = get_option( 'wpp_options_settings' );
+        $acceptedProviders = $options['accepted_providers'];
     ?>
 
     <table class="table-custom">
         <tr>
             <td>
-                <input type="checkbox" name="wpp_options_settings[accepted_providers][visa]" value="visa" /> Visa
+                <input type="checkbox" <?php checked( isset($acceptedProviders['visa']), 1 ); ?> name="wpp_options_settings[accepted_providers][visa]" value="visa" /> Visa
             </td>
         </tr>
 
         <tr>
             <td>
-                <input type="checkbox" name="wpp_options_settings[accepted_providers][mastercard]" value="mastercard" /> Mastercard
+                <input type="checkbox" <?php checked( isset($acceptedProviders['mastercard']), 1 ); ?>  name="wpp_options_settings[accepted_providers][mastercard]" value="mastercard" /> Mastercard
             </td>
         </tr>
 
         <tr>
             <td>
-                <input type="checkbox" name="wpp_options_settings[accepted_providers][maestro]" value="maestro" /> Maestro
+                <input type="checkbox" <?php checked( isset($acceptedProviders['maestro']), 1 ); ?> name="wpp_options_settings[accepted_providers][maestro]" value="maestro" /> Maestro
             </td>
         </tr>
     </table>
@@ -413,9 +481,11 @@ class WP_Paywall_Admin
 
     public function renderSubscriptionFeeField()
     {
+        $options = get_option( 'wpp_options_settings' );
+        $subscriptionFee = $options['subscription_fee'];
     ?>
 
-    <input type="number" min="0" step="0.01" />
+    <input type="number" min="0" name="wpp_options_settings[subscription_fee]" step="0.01"<?php echo isset($subscriptionFee) ? ' value="' . number_format($subscriptionFee, 2) . '"' : ''; ?> />
 
     <span class="description display-block max-width-25-pc">
         <?php echo __( 'Please set the fee for the subscription required to disable the paywall, formatted if necessary with decimal points.', 'wp-paywall' ); ?>
@@ -428,7 +498,7 @@ class WP_Paywall_Admin
     {
     ?>
 
-    <input data-input-event-target=".subscription-frequency" type="number" min="1" />
+    <input data-input-event-target=".subscription-frequency" type="number" min="0" />
 
     <span class="description display-block max-width-25-pc">
         <?php echo __( 'Please set the period for which the subscription is valid.', 'wp-paywall' ); ?>
@@ -473,13 +543,16 @@ class WP_Paywall_Admin
         {
             return;
         }
+
+        $options = get_option( 'wpp_options_settings' );
+        $defaultCurrency = $options['default_currency'];
     ?>
-    <select>
-        <option value="0" disabled>
+    <select name="wpp_options_settings[default_currency]">
+        <option value="" disabled>
             Please select a currency
         </option>
         <?php foreach ($currencies as $index => $currency): ?>
-        <option value="<?php echo $index + 1; ?>">
+        <option <?php selected( strcmp($defaultCurrency, $currency), 0 ); ?> name="wpp_options_settings[default_currency][<?php echo $currency; ?>]" value="<?php echo $currency; ?>">
             <?php echo $currency; ?>
         </option>
         <?php endforeach; ?> 
@@ -499,15 +572,19 @@ class WP_Paywall_Admin
 
     public function renderBottomBarHeadingField()
     {
+        $options = get_option( 'wpp_content_settings' );
+        $bottomBarHeading = $options['bottom_bar_heading'];
     ?>
-    <input type="text" name="wpp_content_settings[bottom_bar_heading]" draggable value="Subscribe for just a [amount] per [subscription_period]" />
+    <input type="text" name="wpp_content_settings[bottom_bar_heading]" value="<?php echo isset($bottomBarHeading) ? $bottomBarHeading : ''; ?>" />
     <?php
     }
 
     public function renderBottomBarCTATextField()
     {
+        $options = get_option( 'wpp_content_settings' );
+        $bottomBarCTAText = $options['bottom_bar_cta_text'];
     ?>
-    <input type="text" name="wpp_content_settings[bottom_bar_cta_text]" value="View Details" />
+    <input type="text" name="wpp_content_settings[bottom_bar_cta_text]" value="<?php echo isset($bottomBarCTAText) ? $bottomBarCTAText : ''; ?> " />
     <?php
     }
 

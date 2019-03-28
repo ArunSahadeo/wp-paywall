@@ -179,6 +179,7 @@
 .nav-tab.active
 {
     pointer-events: none;
+    background-color: #fff;
 }
 
 .table-custom td
